@@ -34,10 +34,11 @@ def create_sorted_many_related_manager(superclass, rel, *args, **kwargs):
             # intermediary's meta options.
             try:
                 # pylint: disable=protected-access
-                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
+                queryset = self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
                 queryset = super().get_queryset()
-                return self._apply_rel_ordering(queryset)
+
+            return self._apply_rel_ordering(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             # Apply the same ordering for prefetch ones
@@ -232,7 +233,7 @@ class SortedManyToManyField(_ManyToManyField):
 
         if rel.symmetrical and (rel.model == "self" or rel.model == cls._meta.object_name):
             rel.related_name = "%s_rel_+" % name
-        elif rel.is_hidden():
+        elif rel.hidden:
             # If the backwards relation is disabled, replace the original
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
