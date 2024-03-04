@@ -184,6 +184,21 @@ class TestSortedManyToManyField(TestCase):
 
         self.assertEqual(get_ids(shelf.books.all()), get_ids(books))
 
+    def test_prefetch_override_sorting(self):
+        shelf = self.model.objects.create()
+        books = sorted([self.books[0], self.books[1], self.books[2]], key=lambda x: x.name)
+
+        for b in books[::-1]:
+            shelf.books.add(b)
+            shelf.save()
+
+        books_from_shelf = self.model.objects.filter(pk=shelf.pk).prefetch_related('books').order_by('books__name')
+
+        def get_ids(queryset):
+            return [obj.id for obj in queryset]
+
+        self.assertEqual(get_ids(books_from_shelf.books.all()), get_ids(books))
+
 
 class TestStringReference(TestSortedManyToManyField):
     """
