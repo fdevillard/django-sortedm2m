@@ -19,6 +19,10 @@ jobs:
             django-version: 'main'
           - python-version: '3.9'
             django-version: 'main'
+          - python-version: '3.8'
+            django-version: '5.0'
+          - python-version: '3.9'
+            django-version: '5.0'
 
     services:
       postgres:
