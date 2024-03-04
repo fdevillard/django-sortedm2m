@@ -192,12 +192,10 @@ class TestSortedManyToManyField(TestCase):
             shelf.books.add(b)
             shelf.save()
 
-        books_from_shelf = self.model.objects.filter(pk=shelf.pk).prefetch_related('books').order_by('books__name')
+        shelf = self.model.objects.filter(pk=shelf.pk).prefetch_related('books')
 
-        def get_ids(queryset):
-            return [obj.id for obj in queryset]
-
-        self.assertEqual(get_ids(books_from_shelf.books.all()), get_ids(books))
+        self.assertEqual(
+            [b.id for s in shelf for b in s.books.order_by("name").all()], [b.id for b in books])
 
 
 class TestStringReference(TestSortedManyToManyField):
